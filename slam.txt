@@ -1,0 +1,90 @@
+查看opencv版本 pkg-config --modversion opencv
+cmake错误集合https://blog.csdn.net/jinzhu1911/article/details/89481156
+视觉SLAM所遇问题汇总      https://blog.csdn.net/chenlin41204050/article/details/104753483
+
+第三章 
+运行plotTrajectory.cpp时，plotTrajectory.cpp文件中报错“cannot find trajectory file at ./examples/trajectory.txt”。因为CLion默认会在工程目录下创建cmake-build-debug文件夹用来存放中间文件。
+将string trajectory_file = "./examples/trajectory.txt";
+改为string trajectory_file = "/home/bing/slambook2-master/ch3/examples";
+
+
+
+第四章 
+安装sophus cmake报错 解决方法https://blog.csdn.net/weixin_41698305/article/details/116547361
+编译完成之后需要安装，不然会报错
+
+Cmake  slambook/ch4/example/trajectoryError.cpp时,会报错，需要设定cmake最小版本，并且在CMakeLists.txt文件中声明一个工程   project(trajectoryError)
+
+运行slambook/ch4/example/trajectoryError.cpp时，会出现
+./example/groundtruth.txt not found.
+./example/estimated.txt not found.  需要将trajectoryError.cpp中的trajectoryError.cpp文件中修改string groundtruth_file = "./example/groundtruth.txt"为string groundtruth_file = "../../example/groundtruth.txt"；
+修改string estimated_file = "./example/estimated.txt"为string estimated_file = "../../example/estimated.txt"
+
+
+
+
+
+第五章
+下载opencv3.10 https://opencv.org/releases/page/5/
+安装opencv依赖项时，libjasper-dev无法定位，
+解决方法：
+sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+sudo apt update
+sudo apt install libjasper1 libjasper-dev
+然后再安装依赖项
+
+cmake时，OpenCV3.1.0编译时出现/usr/include/c++/7/cstdlib:75:15: fatal error: stdlib.h: 没有那个文件或目录
+解决方法：cmake .. -D ENABLE_PRECOMPILED_HEADERS=OFF
+
+cmake时，Ubuntu 源码安装opencv310 报错 error: 'CODEC_FLAG_GLOBAL_HEADER' was not declared in th。。。。
+解决方法：
+在opencv-3.1.0/modules/videoio/src/cap_ffmpeg_impl.hpp 里最顶端添加了：
+#define AV_CODEC_FLAG_GLOBAL_HEADER (1 << 22)
+#define CODEC_FLAG_GLOBAL_HEADER AV_CODEC_FLAG_GLOBAL_HEADER
+#define AVFMT_RAWPICTURE 0x0020
+
+opencv  Cmake过程中在ippicv_2017u3_lnx_intel64_general_20180518.tgz出出问题，需手动安装，参考https://www.wandouip.com/t5i170326/
+我用的opencv3.4.3，下载网址如下，
+https://raw.githubusercontent.com/opencv/opencv_3rdparty/bdb7bb85f34a8cb0d35e40a81f58da431aa1557a/ippicv/ippicv_2017u3_lnx_intel64_general_20180518.tgz
+
+
+opencv安装完成之后编译slambook/ch5/imageBasics/imageBasics.cpp时，会出现找不到opencv库的问题，需修改源代码中提供的CMakeLists.txt文件，修改之后的内容如下：
+cmake_minimum_required(VERSION 3.0)
+
+project(imageBasics)
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
+find_package(OpenCV REQUIRED)
+include_directories( " ${OpenCV_INCLUDE_DIRS}")
+add_executable(imageBasics imageBasics.cpp)
+
+# 链接OpenCV库
+target_link_libraries(imageBasics ${OpenCV_LIBS})
+
+add_executable(undistortImage undistortImage.cpp)
+# 链接OpenCV库
+target_link_libraries(undistortImage ${OpenCV_LIBS})
+
+
+
+
+
+cmake   -D CMAKE_BUILD_TYPE=RELEASE   -D CMAKE_INSTALL_PREFIX=/home/bing/opencv install/opencv-3.4.3   -D WITH_TBB=ON   -D WITH_V4L=ON -D WITH_LIBV4L=ON   -D WITH_CUDA=ON   -D ENABLE_FAST_MATH=1  -D CUDA_FAST_MATH=1   -D CUDA_NVCC_FLAGS="-D_FORCE_INLINES"   -D WITH_CUBLAS=1 -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-3.4.3/modules -D BUILD_opencv_dnn=ON ..
+
+
+cmake ../opencv \
+-DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_INSTALL_PREFIX=/usr/local \
+-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules \
+-DBUILD_DOCS=ON \
+-DBUILD_EXAMPLES=ON \
+-DPYTHON3_EXECUTABLE=/usr/bin/python3 \
+-DPYTHON_INCLUDE_DIR=/usr/include/python3.8 \
+-DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.8.so \
+-DPYTHON3_NUMPY_INCLUDE_DIRS=/home/bbnc/.local/lib/python3.8/site-packages/numpy/core/include \
+-DOPENCV_GENERATE_PKGCONFIG=ON \
+-DWITH_GTK_2_X=ON \
+-DWITH_OPENGL=ON
+
+
+cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_GENERATE_PKGCONFIG=ON -D OPENCV_ENABLE_NONFREE=YES -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules/ ..
